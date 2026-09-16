@@ -23,6 +23,7 @@ import { Event } from '../spec-utils/event';
 
 export interface ProvisionOptions {
 	dockerPath: string | undefined;
+	runtimeArgs?: string[];
 	dockerComposePath: string | undefined;
 	containerDataFolder: string | undefined;
 	containerSystemDataFolder: string | undefined;
@@ -206,6 +207,7 @@ export async function createDockerParams(options: ProvisionOptions, disposables:
 	const buildKitVersion = options.useBuildKit === 'never' ? undefined : (await dockerBuildKitVersion({
 		cliHost,
 		dockerCLI: dockerPath,
+		runtimeArgs: options.runtimeArgs,
 		dockerComposeCLI,
 		env: cliHost.env,
 		output,
@@ -213,11 +215,12 @@ export async function createDockerParams(options: ProvisionOptions, disposables:
 		targetPlatformInfo
 	}));
 
-	const cliVariant = await lookupCLIVariant({ exec: cliHost.exec, cmd: dockerPath, env: cliHost.env, output });
+	const cliVariant = await lookupCLIVariant({ exec: cliHost.exec, cmd: dockerPath, args: options.runtimeArgs, env: cliHost.env, output });
 
 	const dockerEngineVer = await dockerEngineVersion({
 		cliHost,
 		dockerCLI: dockerPath,
+		runtimeArgs: options.runtimeArgs,
 		dockerComposeCLI,
 		env: cliHost.env,
 		output,
@@ -229,6 +232,7 @@ export async function createDockerParams(options: ProvisionOptions, disposables:
 		common,
 		parsedAuthority,
 		dockerCLI: dockerPath,
+		runtimeArgs: options.runtimeArgs,
 		cliVariant,
 		dockerComposeCLI: dockerComposeCLI,
 		dockerEnv: cliHost.env,
